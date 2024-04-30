@@ -1,0 +1,66 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Face Landmarker</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <script type="importmap">
+    {
+      "imports": {
+        "@mediapipe/tasks-vision": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision",
+        "@mediapipe/tasks-text": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-text",
+        "@mediapipe/tasks-audio": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-audio"
+      }
+    }
+    </script>
+</head>
+<body>
+
+    <div class="invitation blur">
+        <p class="instruction">
+            To enter this site, you must first make an offering.
+        </p>
+
+        <div class="button">
+            I am willing.
+        </div>
+    </div>
+
+    <!-- <svg viewbox="0 0 100 100">
+        <polygon></polygon>
+        <polygon points="0,11 9,2.5 9,19.5" class="lid-shape left" />
+        <polygon points="32,11 23,2.5 23,19.5" class="lid-shape right" />
+        
+        <circle r="9" cy="11" cx="16" stroke-width="4" class="outer-eye" />
+        <circle r="2" cy="11" cx="16" class="inner-eye" />
+    </svg> -->
+
+    <div class="userFace hidden"></div>
+
+    <div class="userEyes eyes visible">
+        <div class="userEye left">
+        </div>
+        <div class="userEye right"> 
+        </div>
+    </div>
+
+    <div class="main hidden">
+
+    </div>
+
+    <div class="videoView">
+        <div style="position: relative;">
+            <video id="webcam" autoplay playsinline style="display:none"></video>
+        </div>
+    </div>
+
+  <script type="module" src="main.js"></script>
+  <script type="module" src="audio.js"></script>
+</body>
+
+
+</html>

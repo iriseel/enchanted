@@ -1,0 +1,133 @@
+html, * {
+    box-sizing: border-box;
+    
+}
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+*::before, *::after{
+    box-sizing: inherit;
+}
+
+body {
+    background:black;
+    overflow:hidden;
+    font-size:20px;
+}
+
+video {
+    display:none;
+}
+
+.invitation {
+    position:fixed;
+    z-index:10;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    color: white;
+
+    display:flex;
+    flex-flow: column wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.button {
+    margin-top:3em;
+}
+
+.button:hover {
+    cursor:pointer;
+}
+
+/* svg {
+    position:absolute;
+    top: 0;
+    left:0;
+    display: block;
+    width: 15rem;
+    margin: 0 auto;
+    z-index:200;
+      fill: grey;
+      stroke: white;
+} */
+
+/* STAGE 1 */
+.userFace {
+    position:fixed;
+    z-index:9;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+
+    opacity: 50%;
+    background:white;
+    filter: blur(50px);
+    
+}
+
+/* STAGE 3 */
+.audio {
+    color:white;
+    position:fixed;
+    z-index:20;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.userEyes {
+    position:absolute;
+    top: 10%;
+    display:flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    width:calc(100vmax - 1em);
+    height: calc(100vmax / 5);
+}
+
+.userEye {
+    background:white;
+    width:45%;
+    height:100%;
+    border-radius: 50%;
+    z-index:20;
+    filter: blur(20px);
+}
+
+.BGeyes {
+    position:absolute;
+    display:flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    height:20px;
+    width:calc(20px * 3);
+    /* background:blue; */
+    
+}
+
+.BGeye {
+    position:relative;
+    width:20%;
+    height:80%;
+    border-radius: 50%;
+    background:red;
+    display:block;
+    filter: blur(4px);
+}
+
+.hidden {
+    visibility:hidden;
+    display:none;
+}
+
+.blur {
+
+    filter: blur(1px);
+}
