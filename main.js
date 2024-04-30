@@ -153,7 +153,7 @@ async function predictWebcam() {
         // const points = `${results.faceLandmarks[0][33].x* 500},${results.faceLandmarks[0][33].y* 500} ${results.faceLandmarks[0][159].x* 500},${results.faceLandmarks[0][159].y* 500} ${results.faceLandmarks[0][133].x* 500},${results.faceLandmarks[0][133].y* 500} ${results.faceLandmarks[0][145].x* 500},${results.faceLandmarks[0][145].y* 500}`;
         // stage1LeftEye.setAttribute("points", points);
     }
-    if (stage3) {
+    else if (stage3) {
         userEyes.classList.add("hidden");
         instruction.innerText = "Now, offer your voice.";
         button.innerText = "(Tell me your name.)";
@@ -161,6 +161,7 @@ async function predictWebcam() {
         stage3 = false;
     }
     else if (stage4) {
+        instruction.innerText = "Your have shown your devotion. Now, you may enter.";
         userEyes.classList.add("hidden");
         main.classList.remove("hidden");
 
@@ -291,10 +292,10 @@ function generateEyes() {
     for (let i = 0; i < numDivs; i++) {
 
         const leftEyeDiv = document.createElement("div");
-        leftEyeDiv.classList.add("eye", "left");
+        leftEyeDiv.classList.add("BGeye", "left");
 
         const rightEyeDiv = document.createElement("div");
-        rightEyeDiv.classList.add("eye", "right");
+        rightEyeDiv.classList.add("BGeye", "right");
 
         const eyesContainer = document.createElement("div");
         eyesContainer.classList.add("BGeyes", "eyes");
@@ -335,12 +336,14 @@ function matchEyeHeight(
             been_open = false;
             eyesClosed++;
             console.log(eyesClosed);
-            if (stage2 && eyesClosed >= 6) {
+            //!! Change this number to 6 later !!
+            if (stage2 && eyesClosed >= 1) {
                 eyesClosed = 0;
+                stage2 = false;
                 stage3 = true;
                 console.log("blinked 6 times")
             }
-            if (eyesClosed > getRandomNumber(1,4))
+            if (stage4 && eyesClosed > getRandomNumber(1,4))
             {
                 randomEyes();
                 eyesClosed = 0;
@@ -396,12 +399,14 @@ function setEyeHeight(selector, eyeHeight) {
     let th = Math.floor(eyeHeight);
     const visibleEyeContainers = document.querySelectorAll(".eyes.visible");
     visibleEyeContainers.forEach((visibleEyeContainer) => {
-        visibleEyeContainer.querySelector(selector).style.height = `${th}%`;}
+        if (visibleEyeContainer.querySelector(selector)) {
+            visibleEyeContainer.querySelector(selector).style.height = `${th}%`;}
+        }
     );
 
 }
 
 (function init() {
-    // generateEyes();
-    // randomEyes();
+    generateEyes();
+    randomEyes();
 })();
