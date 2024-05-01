@@ -24,18 +24,19 @@ video {
 }
 
 canvas {
-    /* width:100vw; */
-    height:20vh;
-    aspect-ratio: 1/.9;
+    width:100vw;
+    height:100vh;
+    
     position:absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-45%, -45%);
+    top:0;
+    left:0;
     z-index: -1;
 
     transition: filter 1s, width 1s, height 1s, top 1s, left 1s;
 
     /* background:pink; */
+
+    filter: blur(10px);
 }
 
 .invitation {

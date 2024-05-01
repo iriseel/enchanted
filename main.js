@@ -34,7 +34,7 @@ let n_landmarks = [];
 //   gridContainer.appendChild(gridItem);
 // }
 
-let stage1 = true;
+let stage1 = false;
 let stage1Launched = false;
 //STAGE 1 // COME CLOSER
 const userFace = document.querySelector(".userFace");
@@ -109,10 +109,13 @@ function enableCam() {
   
 }
 
+setTimeout(enableCam,100);
+
 
 let lastVideoTime = -1;
 let results = undefined;
 async function predictWebcam() {
+    console.log("called")
 
   let startTimeMs = performance.now();
   if (lastVideoTime !== video.currentTime) {
@@ -163,11 +166,7 @@ async function predictWebcam() {
     landmarks_y_cropped = [];
 
     // draw landmarks on face
-    faceCanvasCtx.beginPath();
-
-
     for (const landmarks of results.faceLandmarks) {
-
 
         landmarks.forEach((landmark, i) => {
 
@@ -180,45 +179,39 @@ async function predictWebcam() {
                 let landmark_y =
                     landmark_y_percent * faceCanvasElement.height;
 
-                let landmark_x_cropped =
+                //this code scales up the landmark positions from their original x,y to the new zoomed-in scale
+                let landmark_x_cropped1 =
                     ((landmark_x - crop_x) / crop_width ) *
-                    faceCanvasElement.width - 340;
-                let landmark_y_cropped =
+                    faceCanvasElement.width/3;
+                let landmark_y_cropped1 =
                     ((landmark_y - crop_y) / crop_height) *
-                    faceCanvasElement.height - 70;
+                    faceCanvasElement.height/3;
 
-                //these values are for the connectors, since they take landmarks values in percentages, not absolute values
-                let landmark_x_percent_cropped = (landmark_x_percent - crop_x_percent) / crop_width_percent - .265;
-                let landmark_y_percent_cropped =
-                (landmark_y_percent - crop_y_percent) / crop_height_percent - .1;
+                const scaleFactor = 1.5; // Adjust as needed
+
+                let landmark_x_cropped2 =
+                    ((landmark_x - crop_x) / crop_width ) *
+                    faceCanvasElement.width/2;
+                let landmark_y_cropped2 =
+                    ((landmark_y - crop_y) / crop_height) *
+                    faceCanvasElement.height/2;
+
+                    const scaledX2 = landmark_x_cropped2 + (landmark_x_cropped2 - landmark_x_cropped1) * scaleFactor;
+const scaledY2 = landmark_y_cropped2 + (landmark_y_cropped2 - landmark_y_cropped1) * scaleFactor;
 
 
-                //pushes these values to global array
-                landmarks_x_cropped.push(landmark_x_cropped);
-                landmarks_y_cropped.push(landmark_y_cropped);
-
-                faceCanvasCtx.font = "20px Quorum";
-                faceCanvasCtx.fillStyle = "red";
-;
-
-                // Move to the first landmark
-                if (i === 10) {
-                    faceCanvasCtx.moveTo(landmark_x_cropped, landmark_y_cropped);
-                } else {
-                    // Draw a line to the current landmark
-                    faceCanvasCtx.lineTo(landmark_x_cropped, landmark_y_cropped);
+                faceCanvasCtx.font = "10px Quorum";
+                faceCanvasCtx.fillStyle = "white";
+            
+                    faceCanvasCtx.fillText(
+                        "offer", landmark_x_cropped1, landmark_y_cropped1
+                    );
+                    
+                    faceCanvasCtx.fillText(
+                        "offer", scaledX2 + getRandomNumber(0,20), scaledY2 + getRandomNumber(0,20)
+                    );
                 }
-                    }
-                })}
-
-                faceCanvasCtx.strokeStyle = 'red';
-                faceCanvasCtx.lineWidth = 2;
-
-                // Draw the path
-                faceCanvasCtx.stroke();
-
-                // Close the path
-                faceCanvasCtx.closePath();
+            })}
 
 
     if (stage1) {
