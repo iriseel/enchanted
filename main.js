@@ -19,21 +19,6 @@ const instruction = document.querySelector(".instruction");
 const button = document.querySelector(".button");
 
 
-const faceCanvasElement = document.getElementsByClassName("face_canvas")[0];
-const faceCanvasCtx = faceCanvasElement.getContext("2d");
-let landmarks_x_cropped = [];
-let landmarks_y_cropped = [];
-let n_landmarks = [];
-
-// const gridContainer = document.querySelector('.grid-container');
-
-// // Create grid items dynamically
-// for (let i = 0; i < 30 * 30; i++) {
-//   const gridItem = document.createElement('div');
-//   gridItem.classList.add('animated');
-//   gridContainer.appendChild(gridItem);
-// }
-
 let stage1 = false;
 let stage1Launched = false;
 //STAGE 1 // COME CLOSER
@@ -86,7 +71,10 @@ function hasGetUserMedia() {
 }
 
 if (hasGetUserMedia()) {
-  button.addEventListener("click", enableCam);
+//   button.addEventListener("click", enableCam);
+    button.addEventListener("click", function() {
+        stage1 = true;
+    });
 } else {
   console.warn("getUserMedia() is not supported by your browser");
 }
@@ -137,81 +125,6 @@ async function predictWebcam() {
     // LEFT EYE ////////////////////////////////
     let left_eye_bottom_y = results.faceLandmarks[0][477].y;
     let left_eye_top_y = results.faceLandmarks[0][475].y;
-
-
-
-    //Facemesh/mediapipe gives the x and y values of its landmarks as percentages of the total webcam view size (where 0 is leftmost, 1 is rightmost), rather than specific numerical coordinates.
-    let crop_x_percent = results.faceLandmarks[0][234].x;
-    let crop_y_percent = results.faceLandmarks[0][10].y;
-    //making this smaller so it doesn't get cut off at edges of canvas
-    crop_x_percent = crop_x_percent * .65;
-    crop_y_percent = crop_y_percent * .65;
-
-    let crop_width_percent =
-        results.faceLandmarks[0][454].x - crop_x_percent;
-    let crop_height_percent =
-        results.faceLandmarks[0][152].y - crop_y_percent;
-
-    // // multiply the percentages by the faceCanvasElement to get their absolute x,y values, rather than just percentages
-    let crop_x = crop_x_percent * faceCanvasElement.width;
-    let crop_y = crop_y_percent * faceCanvasElement.height;
-    let crop_width = crop_width_percent * faceCanvasElement.width;
-    let crop_height = crop_height_percent * faceCanvasElement.height;
-
-    faceCanvasCtx.save();
-
-    clear_canvas();
-    n_landmarks = [];
-    landmarks_x_cropped = [];
-    landmarks_y_cropped = [];
-
-    // draw landmarks on face
-    for (const landmarks of results.faceLandmarks) {
-
-        landmarks.forEach((landmark, i) => {
-
-            if (i == 10 || i == 338 || i == 297 || i == 332 || i == 284 || i == 251 || i == 389 || i == 356 || i == 454 || i == 366 || i == 323 || i == 401 || i == 361 || i == 435 || i == 288 || i == 397 || i == 365 || i == 379 || i == 378 || i == 400 || i == 377 || i == 152 || i == 148 || i == 176 || i == 149 || i == 150 || i == 136 || i == 172 || i == 58 || i == 132 || i == 93 || i == 234 || i == 127 || i == 162 || i == 21 || i == 54 || i == 103 || i == 67 || i == 109) {
-
-                let landmark_x_percent = landmark.x;
-                let landmark_y_percent = landmark.y;
-                let landmark_x =
-                    landmark_x_percent * faceCanvasElement.width;
-                let landmark_y =
-                    landmark_y_percent * faceCanvasElement.height;
-
-                //this code scales up the landmark positions from their original x,y to the new zoomed-in scale
-                let landmark_x_cropped1 =
-                    ((landmark_x - crop_x) / crop_width ) *
-                    faceCanvasElement.width/3;
-                let landmark_y_cropped1 =
-                    ((landmark_y - crop_y) / crop_height) *
-                    faceCanvasElement.height/3;
-
-                const scaleFactor = 1.5; // Adjust as needed
-
-                let landmark_x_cropped2 =
-                    ((landmark_x - crop_x) / crop_width ) *
-                    faceCanvasElement.width/2;
-                let landmark_y_cropped2 =
-                    ((landmark_y - crop_y) / crop_height) *
-                    faceCanvasElement.height/2;
-
-                    const scaledX2 = landmark_x_cropped2 + (landmark_x_cropped2 - landmark_x_cropped1) * scaleFactor;
-const scaledY2 = landmark_y_cropped2 + (landmark_y_cropped2 - landmark_y_cropped1) * scaleFactor;
-
-
-                faceCanvasCtx.font = "10px Quorum";
-                faceCanvasCtx.fillStyle = "white";
-            
-                    faceCanvasCtx.fillText(
-                        "offer", landmark_x_cropped1, landmark_y_cropped1
-                    );
-                    
-                    faceCanvasCtx.fillText(
-                        "offer", scaledX2 + getRandomNumber(0,20), scaledY2 + getRandomNumber(0,20)
-                    );
-                }
-            })}
 
 
     if (stage1) {
@@ -312,15 +225,6 @@ function map(in_val, in_min, in_max, out_min, out_max) {
 
 function getRandomIndex(max) {
     return Math.floor(Math.random() * max);
-}
-
-function clear_canvas() {
-    faceCanvasCtx.clearRect(
-        0,
-        0,
-        faceCanvasElement.width,
-        faceCanvasElement.height
-    );
 }
 
 

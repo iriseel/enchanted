@@ -11,7 +11,7 @@ function wrapLettersWithSpan() {
   
       // Replace the text content with wrapped letters
       const letters = text.split("");
-      const spannedText = letters.map(letter => `<span class="animated-text">${letter}</span>`).join("");
+      const spannedText = letters.map(letter => `<span class="animated">${letter}</span>`).join("");
       invitationElement.innerHTML = spannedText;
     });
 

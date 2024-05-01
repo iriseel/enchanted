@@ -23,22 +23,6 @@ video {
     display:none;
 }
 
-canvas {
-    width:100vw;
-    height:100vh;
-    
-    position:absolute;
-    top:0;
-    left:0;
-    z-index: -1;
-
-    transition: filter 1s, width 1s, height 1s, top 1s, left 1s;
-
-    /* background:pink; */
-
-    filter: blur(10px);
-}
-
 .invitation {
     position:fixed;
     z-index:10;
@@ -70,44 +54,27 @@ canvas {
     align-items: center;
     /* background:blue; */
     width:100%;
+    color:white;
 }
 
-
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(20, 1fr);
-    grid-template-rows: repeat(20, 1fr);
-    width:100vw;
-    height: 100vh;
-    z-index:1;
-    position:fixed;
-    top:0;
-    left:0;
-    /* filter:blur(5px); */
-}
 
 .animated {
     display:flex;
     flex-flow: row wrap;
     justify-content: center;
     align-content: center;
-    width:.5em;
-    height:.5em;
     text-align:center;
     animation: pulse 10s linear infinite;
     /* margin: 0 .3rem; */
-    border-radius:50%;
-    background:black;
-    box-shadow: 
+    /* border-radius:50%;
+    background:black; */
+    text-shadow: 
         0 0 10px 10px white, /* First shadow */
         0 0 20px 10px black, /* Second shadow */
         0 0 30px 10px black;
     opacity:0;
 }
 
-.animated-text {
-    
-}
 
 @keyframes pulse {
     0% {
