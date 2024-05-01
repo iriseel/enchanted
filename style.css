@@ -58,21 +58,19 @@ video {
 }
 
 
-.animated {
+.animated-text {
     display:flex;
     flex-flow: row wrap;
     justify-content: center;
     align-content: center;
     text-align:center;
     animation: pulse 10s linear infinite;
-    /* margin: 0 .3rem; */
-    /* border-radius:50%;
-    background:black; */
     text-shadow: 
         0 0 10px 10px white, /* First shadow */
         0 0 20px 10px black, /* Second shadow */
         0 0 30px 10px black;
     opacity:0;
+    filter: blur(10px);
 }
 
 
@@ -80,32 +78,20 @@ video {
     0% {
         opacity:0;
         transform: scale(1);
-        filter: hue-rotate(0deg);
+        filter: blur(10px) hue-rotate(0deg);
     }
     50% {
         opacity:1;
         transform: scale(2);
-        filter: hue-rotate(180deg);
+        filter: blur(0px) hue-rotate(180deg);
     }
     100% {
         opacity:0;
         transform: scale(1);
-        filter: hue-rotate(0deg);
+        filter: blur(10px) hue-rotate(0deg);
     }
 }
 
-/* @keyframes textRotation {
-	to {
-		transform: rotate(360deg);
-	}
-}
-
-.instruction span {
-	position: absolute;
-	left: 50%;
-	font-size: 1.2em;
-	transform-origin: 0 200px;
-} */
 
 .button {
     margin-top:3em;

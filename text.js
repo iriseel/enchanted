@@ -11,11 +11,11 @@ function wrapLettersWithSpan() {
   
       // Replace the text content with wrapped letters
       const letters = text.split("");
-      const spannedText = letters.map(letter => `<span class="animated">${letter}</span>`).join("");
+      const spannedText = letters.map(letter => `<span class="animated-text">${letter}</span>`).join("");
       invitationElement.innerHTML = spannedText;
     });
 
-  document.querySelectorAll('.animated').forEach(letter => { 
+  document.querySelectorAll('.animated-text').forEach(letter => { 
     animationDelay+=100;
     letter.style.animationDelay = `${animationDelay}ms`;
   });
