@@ -18,21 +18,41 @@ const invitation = document.querySelector(".invitation");
 const instruction = document.querySelector(".instruction");
 const button = document.querySelector(".button");
 
+
+const faceCanvasElement = document.getElementsByClassName("face_canvas")[0];
+const faceCanvasCtx = faceCanvasElement.getContext("2d");
+let landmarks_x_cropped = [];
+let landmarks_y_cropped = [];
+let n_landmarks = [];
+
+// const gridContainer = document.querySelector('.grid-container');
+
+// // Create grid items dynamically
+// for (let i = 0; i < 30 * 30; i++) {
+//   const gridItem = document.createElement('div');
+//   gridItem.classList.add('animated');
+//   gridContainer.appendChild(gridItem);
+// }
+
 let stage1 = true;
+let stage1Launched = false;
 //STAGE 1 // COME CLOSER
 const userFace = document.querySelector(".userFace");
 
 
 let stage2 = false;
+let stage2Launched = false;
 //STAGE 2 // BLINK
 const userEyes = document.querySelector(".userEyes");
 // const stage1LeftEye = document.querySelector("svg polygon");
 
 let stage3 = false;
+let stage3Launched = false;
 //STAGE 3 // SPEAK
 let wordCount;
 
 let stage4 = false;
+let stage4Launched = false;
 //STAGE 4
 const main = document.querySelector(".main");
 let eyeHeight;
@@ -89,6 +109,7 @@ function enableCam() {
   
 }
 
+
 let lastVideoTime = -1;
 let results = undefined;
 async function predictWebcam() {
@@ -103,6 +124,9 @@ async function predictWebcam() {
     let face_bottom_y = results.faceLandmarks[0][152].y;
     let face_top_y = results.faceLandmarks[0][10].y;
 
+    let nose_y = results.faceLandmarks[0][1].y;
+    let nose_x = results.faceLandmarks[0][1].x;
+
     // RIGHT EYE ////////////////////////////////
     let right_eye_bottom_y = results.faceLandmarks[0][472].y;
     let right_eye_top_y = results.faceLandmarks[0][470].y;
@@ -111,25 +135,115 @@ async function predictWebcam() {
     let left_eye_bottom_y = results.faceLandmarks[0][477].y;
     let left_eye_top_y = results.faceLandmarks[0][475].y;
 
+
+
+    //Facemesh/mediapipe gives the x and y values of its landmarks as percentages of the total webcam view size (where 0 is leftmost, 1 is rightmost), rather than specific numerical coordinates.
+    let crop_x_percent = results.faceLandmarks[0][234].x;
+    let crop_y_percent = results.faceLandmarks[0][10].y;
+    //making this smaller so it doesn't get cut off at edges of canvas
+    crop_x_percent = crop_x_percent * .65;
+    crop_y_percent = crop_y_percent * .65;
+
+    let crop_width_percent =
+        results.faceLandmarks[0][454].x - crop_x_percent;
+    let crop_height_percent =
+        results.faceLandmarks[0][152].y - crop_y_percent;
+
+    // // multiply the percentages by the faceCanvasElement to get their absolute x,y values, rather than just percentages
+    let crop_x = crop_x_percent * faceCanvasElement.width;
+    let crop_y = crop_y_percent * faceCanvasElement.height;
+    let crop_width = crop_width_percent * faceCanvasElement.width;
+    let crop_height = crop_height_percent * faceCanvasElement.height;
+
+    faceCanvasCtx.save();
+
+    clear_canvas();
+    n_landmarks = [];
+    landmarks_x_cropped = [];
+    landmarks_y_cropped = [];
+
+    // draw landmarks on face
+    faceCanvasCtx.beginPath();
+
+
+    for (const landmarks of results.faceLandmarks) {
+
+
+        landmarks.forEach((landmark, i) => {
+
+            if (i == 10 || i == 338 || i == 297 || i == 332 || i == 284 || i == 251 || i == 389 || i == 356 || i == 454 || i == 366 || i == 323 || i == 401 || i == 361 || i == 435 || i == 288 || i == 397 || i == 365 || i == 379 || i == 378 || i == 400 || i == 377 || i == 152 || i == 148 || i == 176 || i == 149 || i == 150 || i == 136 || i == 172 || i == 58 || i == 132 || i == 93 || i == 234 || i == 127 || i == 162 || i == 21 || i == 54 || i == 103 || i == 67 || i == 109) {
+
+                let landmark_x_percent = landmark.x;
+                let landmark_y_percent = landmark.y;
+                let landmark_x =
+                    landmark_x_percent * faceCanvasElement.width;
+                let landmark_y =
+                    landmark_y_percent * faceCanvasElement.height;
+
+                let landmark_x_cropped =
+                    ((landmark_x - crop_x) / crop_width ) *
+                    faceCanvasElement.width - 340;
+                let landmark_y_cropped =
+                    ((landmark_y - crop_y) / crop_height) *
+                    faceCanvasElement.height - 70;
+
+                //these values are for the connectors, since they take landmarks values in percentages, not absolute values
+                let landmark_x_percent_cropped = (landmark_x_percent - crop_x_percent) / crop_width_percent - .265;
+                let landmark_y_percent_cropped =
+                (landmark_y_percent - crop_y_percent) / crop_height_percent - .1;
+
+
+                //pushes these values to global array
+                landmarks_x_cropped.push(landmark_x_cropped);
+                landmarks_y_cropped.push(landmark_y_cropped);
+
+                faceCanvasCtx.font = "20px Quorum";
+                faceCanvasCtx.fillStyle = "red";
+;
+
+                // Move to the first landmark
+                if (i === 10) {
+                    faceCanvasCtx.moveTo(landmark_x_cropped, landmark_y_cropped);
+                } else {
+                    // Draw a line to the current landmark
+                    faceCanvasCtx.lineTo(landmark_x_cropped, landmark_y_cropped);
+                }
+                    }
+                })}
+
+                faceCanvasCtx.strokeStyle = 'red';
+                faceCanvasCtx.lineWidth = 2;
+
+                // Draw the path
+                faceCanvasCtx.stroke();
+
+                // Close the path
+                faceCanvasCtx.closePath();
+
+
     if (stage1) {
-        instruction.innerText = "First, come closer.";
-        button.innerText = "";
-        userFace.classList.remove("hidden");
+        if (stage1Launched == false) {
+            instruction.innerText = "First, come closer.";
+            button.innerText = "";
+            userFace.classList.replace("hidden", "fadeIn");
+            stage1Launched = true;
+        }
         
         setFace(
-            face_bottom_y
+            face_bottom_y,
+            face_top_y
         );
 
-        if (face_bottom_y > 1) {
-            stage1 = false;
-            stage2 = true;
-        }
     }
     else if (stage2) {
-        userFace.classList.add("hidden");
-        userEyes.classList.remove("hidden");
-        instruction.innerText = "Now, offer your sight.";
-        button.innerText = "(Blink six times.)";
+        if (stage2Launched == false) {
+            userFace.classList.replace("fadeIn", "hidden");
+            userEyes.classList.replace("hidden", "fadeIn");
+
+            instruction.innerText = "Now, offer your sight.";
+            button.innerText = "(Blink six times.)";
+            stage2Launched = true;
+        }
 
         matchEyeHeight(
             face_bottom_y,
@@ -207,28 +321,44 @@ function getRandomIndex(max) {
     return Math.floor(Math.random() * max);
 }
 
+function clear_canvas() {
+    faceCanvasCtx.clearRect(
+        0,
+        0,
+        faceCanvasElement.width,
+        faceCanvasElement.height
+    );
+}
+
+
 //STAGE 1 FUNCTIONS
 function setFace(
-    face_bottom_y
+    face_bottom_y,
+    face_top_y
 ) {
-    let faceHeight =
-        face_bottom_y * 100;
-        // console.log(faceHeight)
+    let faceHeight = (face_bottom_y -
+        face_top_y) * 100;
+        console.log(faceHeight)
 
-    if (faceHeight <= 50) {
+    if (faceHeight <= 10) {
         faceHeight = 0;
-    } else if (faceHeight >= 100) {
+    } else if (faceHeight >= 60) {
         faceHeight = 100;
     }
     else {
         faceHeight = Math.abs(
-            map(faceHeight, 50, 100, 0, 100)
+            map(faceHeight, 10, 60, 0, 100)
         );
     }
     
     faceHeight = Math.floor(faceHeight);
     userFace.style.height = `${faceHeight}%`;
     userFace.style.width = `${faceHeight * .75}%`;
+
+    if (face_bottom_y > 1) {
+        stage1 = false;
+        stage2 = true;
+    }
 
 }
 

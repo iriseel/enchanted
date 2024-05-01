@@ -16,10 +16,26 @@ body {
     background:black;
     overflow:hidden;
     font-size:20px;
+    line-height:1em;
 }
 
 video {
     display:none;
+}
+
+canvas {
+    /* width:100vw; */
+    height:20vh;
+    aspect-ratio: 1/.9;
+    position:absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-45%, -45%);
+    z-index: -1;
+
+    transition: filter 1s, width 1s, height 1s, top 1s, left 1s;
+
+    /* background:pink; */
 }
 
 .invitation {
@@ -35,7 +51,93 @@ video {
     flex-flow: column wrap;
     justify-content: space-between;
     align-items: center;
+
+    width:1000px;
+
+    /* filter: url(#displacement-filter); */
 }
+
+.instruction {
+	/* animation: textRotation 8s linear infinite;
+	transform-origin: 100px -200px;
+    width:100px;
+    height:100px;
+    background:blue; */
+    display:flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-items: center;
+    /* background:blue; */
+    width:100%;
+}
+
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    grid-template-rows: repeat(20, 1fr);
+    width:100vw;
+    height: 100vh;
+    z-index:1;
+    position:fixed;
+    top:0;
+    left:0;
+    /* filter:blur(5px); */
+}
+
+.animated {
+    display:flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-content: center;
+    width:.5em;
+    height:.5em;
+    text-align:center;
+    animation: pulse 10s linear infinite;
+    /* margin: 0 .3rem; */
+    border-radius:50%;
+    background:black;
+    box-shadow: 
+        0 0 10px 10px white, /* First shadow */
+        0 0 20px 10px black, /* Second shadow */
+        0 0 30px 10px black;
+    opacity:0;
+}
+
+.animated-text {
+    
+}
+
+@keyframes pulse {
+    0% {
+        opacity:0;
+        transform: scale(1);
+        filter: hue-rotate(0deg);
+    }
+    50% {
+        opacity:1;
+        transform: scale(2);
+        filter: hue-rotate(180deg);
+    }
+    100% {
+        opacity:0;
+        transform: scale(1);
+        filter: hue-rotate(0deg);
+    }
+}
+
+/* @keyframes textRotation {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.instruction span {
+	position: absolute;
+	left: 50%;
+	font-size: 1.2em;
+	transform-origin: 0 200px;
+} */
 
 .button {
     margin-top:3em;
@@ -65,10 +167,17 @@ video {
     left: 50%;
     transform: translate(-50%, -50%);
     border-radius: 50%;
+    border: 1px solid white;
+    box-shadow:  
+        0 0 0 5px yellow,
+        0 0 0 10px blue,
+        0 0 0 15px red;
+    background:transparent;
+    /* background: url("assets/death_mask.png") no-repeat center / cover;
+    background-size: 200% 200%; */
+    filter: blur(10px);
 
-    opacity: 50%;
-    background:white;
-    filter: blur(50px);
+    transition: 1s;
     
 }
 
@@ -129,8 +238,13 @@ video {
 }
 
 .hidden {
-    visibility:hidden;
-    display:none;
+    /* visibility:hidden;
+    display:none; */
+    opacity: 0;
+}
+
+.fadeIn {
+    opacity: 1;
 }
 
 .blur {

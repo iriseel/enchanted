@@ -1,0 +1,53 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Face Landmarker</title>
+
+  <style>
+
+    #letter-container {
+        position: relative;
+        font-size: 48px; /* Set the size of the larger letter */
+    }
+    
+    .small-letter {
+        position: absolute;
+        font-size: 10px; /* Set the size of the smaller letters */
+    }
+</style>
+
+</head>
+<body>
+    
+
+<div id="letter-container"></div>
+
+<script>
+
+const letterContainer = document.getElementById("letter-container");
+const letter = "A"; // Change this to the letter you want to generate
+
+// Define the positions of the smaller letters to form the larger letter
+const positions = [
+  { top: 0, left: 0 },
+  { top: 10, left: 5 },
+  // Add more positions as needed
+];
+
+// Generate the smaller letters
+positions.forEach(({ top, left }) => {
+  const smallLetter = document.createElement("span");
+  smallLetter.textContent = letter;
+  smallLetter.classList.add("small-letter");
+  smallLetter.style.top = `${top}px`;
+  smallLetter.style.left = `${left}px`;
+  letterContainer.appendChild(smallLetter);
+});
+</script>
+
+</body>
+
+</html>

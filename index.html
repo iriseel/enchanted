@@ -19,6 +19,8 @@
     </script>
 </head>
 <body>
+  <canvas class="face_canvas" width="1280px" height="720px"></canvas>
+
 
     <div class="invitation blur">
         <p class="instruction">
@@ -57,9 +59,17 @@
             <video id="webcam" autoplay playsinline style="display:none"></video>
         </div>
     </div>
+    <filter id="displacement-filter" width="128" height="128" x="380" y="0" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feImage width="128" height="128" href="https://assets.codepen.io/100347/fed_sagrada-384.jpg" />
+      <feDisplacementMap id="fedisplacementmap" in="SourceGraphic" xChannelSelector="R" yChannelSelector="B" scale="50" />
+    </filter>
+
+    <div class="grid-container">
+      <!-- Grid items will be generated dynamically using JavaScript -->
+    </div>
 
   <script type="module" src="main.js"></script>
-  <script type="module" src="audio.js"></script>
+  <script type="module" src="text.js"></script>
 </body>
 
 
