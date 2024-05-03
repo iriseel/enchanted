@@ -173,14 +173,14 @@ body {
     animation: glow 5s ease-in-out infinite;
     animation-delay: 2s;
     margin-top:3em;
-    filter:blur(calc(var(--blur)/5));
+    /* filter:blur(calc(var(--blur)/5)); */
     transition: filter 1s ease-in-out, opacity 1s ease-in-out;
+    border: inset 2px white;
+    padding: 1rem;
 }
 
 .button:hover {
-    cursor:pointer;
-    opacity:1;
-    filter:blur(0px);
+    transition: transform 1s;
 }
 
 @keyframes glow {
@@ -274,7 +274,6 @@ video {
     display:none;
     /* filter:hue-rotate(90deg); */
 
-    /* filter: url(#displacementFilter); */
 }
 
 .face_canvas {
@@ -307,6 +306,7 @@ video {
 
 .BGeyes {
     position:absolute;
+    z-index:10;
     display:flex;
     flex-flow: row nowrap;
     justify-content: space-between;

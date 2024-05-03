@@ -20,16 +20,16 @@
 </head>
 <body>
 
-  <!-- <svg width="0" height="0" style="position:absolute;">
+  <svg width="0" height="0" style="position:absolute;">
     <filter id="displacementFilter">
-      <feTurbulence type="turbulence" baseFrequency="0.01" numOctaves="3" seed="1" result="turbulence">
-        <animate attributeName="baseFrequency" values="0.1;0.05;0.1;" dur="30s" begin="0"
+      <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" seed="1" result="turbulence">
+        <animate attributeName="baseFrequency" values="0.1;0.05;0.1;" dur="80s" begin="0"
           repeatCount="indefinite" />
       </feTurbulence>
       <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="100" xChannelSelector="R" yChannelSelector="B"
         result="displacement" />
     </filter>
-  </svg> -->
+  </svg>
   
 
     <div class="invitation">
@@ -57,6 +57,7 @@
       <div style="position: relative;">
           <video id="webcam" autoplay playsinline></video>
       </div>
+    </div>
 
     <div class="main hidden">
 
@@ -64,7 +65,7 @@
 
     <div class="bg">
       <div class="bgLeft"></div>
-      <div class="bgCenter"></div>
+      <!-- <div class="bgCenter"></div> -->
       <div class="bgRight"></div>
     </div>
 

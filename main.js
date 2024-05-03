@@ -19,33 +19,48 @@ const instruction = document.querySelector(".instruction");
 const button = document.querySelector(".button");
 const bg = document.querySelector(".bg");
 let fadeInOutTime = 2000;
-let waitForAnimateLetters = fadeInOutTime * 4;
+let animationDelay = 0;
 
 let broodAudio = new Audio('assets/audio/cicadas/broodX.wav');
 broodAudio.loop = true;
 let cicadaAudio = new Audio('assets/audio/cicadas/cicada_close.wav');
 cicadaAudio.loop = true;
+let chimeAudios = [
+    new Audio('assets/audio/chimes/chime1.mp3'),
+    new Audio('assets/audio/chimes/chime2.mp3'),
+    new Audio('assets/audio/chimes/chime3.mp3'),
+    new Audio('assets/audio/chimes/chime4.mp3'),
+    // new Audio('assets/audio/chimes/chime5.mp3'),
+    // new Audio('assets/audio/chimes/chime6.mp3')
+];
+
+let gongAudio = new Audio('assets/audio/gong.wav');
 
 const ghostImageUrls = [
-    "assets/imgs/main/ectoplasm1.gif",
-    "assets/imgs/main/anti-vampire_burial.png",
-    "assets/imgs/main/ectoplasm2.jpeg",
-    "assets/imgs/main/ectoplasm3.jpeg",
-    "assets/imgs/main/Lo_Shu_Square.jpeg", 
-    "assets/imgs/main/magic_circle.jpeg", 
-    "assets/imgs/main/Munich_Manual1.png",
-    "assets/imgs/main/Munich_Manual2.png",
-    "assets/imgs/main/Peppers_Ghost.jpeg",
-    "assets/imgs/main/Solomonic_circle.gif", 
-    "assets/imgs/main/spirit_photo1.jpeg",
-    "assets/imgs/main/spirit_photo2.jpeg",
-    "assets/imgs/main/spirit_photo3.jpeg",
-    "assets/imgs/main/spirit_photo4.jpeg"
+    "assets/imgs/main/spirit_photo4.jpeg", 
+    "assets/imgs/main/anti-vampire_burial.png",  
+    "assets/imgs/main/death_mask.png",  
+    "assets/imgs/main/dragonfly_moult.jpeg",  
+    "assets/imgs/main/ectoplasm1.jpeg",  
+    "assets/imgs/main/ectoplasm2.jpeg",  
+    "assets/imgs/main/ectoplasm3.jpeg",  
+    "assets/imgs/main/leaking_box.png",  
+    "assets/imgs/main/levitating_box.png",  
+    "assets/imgs/main/Lo_Shu_Square.jpeg",  
+    "assets/imgs/main/magic_circle.jpeg",  
+    "assets/imgs/main/mocap_box_leaking.png",  
+    "assets/imgs/main/moths_from_box.png",  
+    "assets/imgs/main/Munich_Manual1.png",  
+    "assets/imgs/main/Munich_Manual2.png",  
+    "assets/imgs/main/Peppers_Ghost.jpeg", 
+    "assets/imgs/main/Solomonic_circle.jpeg", 
+    "assets/imgs/main/spirit_photo1.jpeg", 
+    "assets/imgs/main/spirit_photo2.jpeg", 
+    "assets/imgs/main/spirit_photo3.jpeg", 
 ]
 
 //STAGE 1 // COME CLOSER
 let stage1 = false;
-let stage1Launched = false;
 let stage1Closer = false;
 let stage1EvenCloser = false;
 const userFace = document.querySelector(".userFace");
@@ -53,8 +68,6 @@ const userFace = document.querySelector(".userFace");
 
 //STAGE 2 // BLINK
 let stage2 = false;
-let stage2Launched = false;
-let waited = false;
 const userEyesContainer = document.querySelector(".userEyes");
 const userEyes = document.querySelectorAll(".userEye");
 
@@ -71,12 +84,9 @@ let faceCanvasOpacity = .1;
 
 //STAGE 3 // SPEAK
 let stage3 = false;
-let stage3Launched = false;
-let wordCount;
 
 //STAGE 4
 let stage4 = false;
-let stage4Launched = false;
 const main = document.querySelector(".main");
 let eyeHeight;
 let eyeHeight_max = 100;
@@ -86,6 +96,9 @@ let been_open = true;
 let eyesClosed = 0;
 const eyesClosedRatio = 620;
 const eyesOpenRatio = 680;
+let eyeContainers;
+
+const ghostImagefeDisplacementMap = document.querySelector('#displacementFilter feDisplacementMap');
 
 // Function to create FaceLandmarker
 async function createFaceLandmarker() {
@@ -109,16 +122,17 @@ function hasGetUserMedia() {
 }
 
 if (hasGetUserMedia()) {
-    button.addEventListener("click", function() {
-        // stage1 = true;
-        stage2 = true;
-        // stage3 = true;
-        // stage4 = true;
-        enableCam();
+    function clickedButton() {
+        stage1Start();
         broodAudio.play();
         cicadaAudio.play();
 
-    });
+        button.removeEventListener("click", clickedButton);
+    };
+
+    button.addEventListener("click", clickedButton);
+
+
 } else {
   console.warn("getUserMedia() is not supported by your browser");
 }
@@ -142,6 +156,94 @@ function enableCam() {
 }
 
 
+
+//COME CLOSER
+function stage1Start() { 
+    stage1 = true;
+
+    changeInstructionText("First, come closer.");
+    bg.classList.add("hidden");
+    userFace.classList.replace("hidden", "fadeIn");
+    button.classList.add("hidden");
+    button.removeEventListener("mouseover", buttonHover);
+    button.style.cursor = "default";
+    button.style.animation = "none";
+        
+    setTimeout(() => {
+        enableCam();
+    }, animationDelay / 2);
+}
+
+//BLINK
+function stage2Start() {
+    webcamRunning = false;
+    stage1 = false;
+    stage2 = true;
+    changeInstructionText("Almost close enough to touch.");
+    button.style.border = "none";
+
+    setTimeout(() => {
+        userFace.classList.replace("fadeIn", "hidden");
+        userEyesContainer.classList.replace("hidden", "fadeIn");
+
+        changeInstructionText("Now, offer your sight.");
+        setTimeout(() => { 
+            button.classList.replace("hidden", "fadeIn");
+            button.style.animation = "glow 5s ease-in-out infinite";
+            button.innerText = "(Blink six times.)";
+            enableCam();
+        }, animationDelay / 2);
+
+    }, animationDelay + 800);
+}
+
+//SAY YOUR NAME
+function stage3Start() {
+    stage2 = false;
+    stage3 = true;
+    webcamRunning = false;
+    userEyesContainer.classList.replace("fadeIn", "hidden");
+
+    button.innerText = "";
+    changeInstructionText("Then, your voice.");
+    setTimeout(() => { 
+        button.innerText = "(Tell me your name, with strength and clarity.)";
+    }, animationDelay + 400);
+    detectVoice();
+}
+
+//MAIN
+function stage4Start() {
+    stage3 = false;
+    stage4 = true;
+    webcamRunning = false;
+
+    userEyesContainer.style.display = "none";
+    userFace.style.display = "none"; 
+
+    changeInstructionText("You have shown your devotion. Now, you may enter.");
+    gongAudio.play();
+    button.style.display = "none";
+    generateEyes();
+
+    eyeContainers = document.querySelectorAll(".eyes.BGEyes");
+    eyeContainers.forEach((eyeContainer) => {
+        eyeContainer.classList.add("hidden");
+    });
+
+    randomEyes();
+
+    setTimeout(() => {
+        instruction.classList.add("hidden");
+        button.classList.add("hidden");
+    }, animationDelay + 400);
+
+    main.classList.replace("hidden", "fadeIn");
+
+    enableCam();
+}
+
+
 let lastVideoTime = -1;
 let results = undefined;
 async function predictWebcam() {
@@ -155,9 +257,6 @@ async function predictWebcam() {
     //Using this right_eye_face_ratio to return the ratio as a percentage (percentage of face that eye takes up) rather than absolute values, and therefore right_eye_face_ratio won't change with the user's distance from the webcam
     let face_bottom_y = results.faceLandmarks[0][152].y;
     let face_top_y = results.faceLandmarks[0][10].y;
-
-    let nose_y = results.faceLandmarks[0][1].y;
-    let nose_x = results.faceLandmarks[0][1].x;
 
     // RIGHT EYE ////////////////////////////////
     let right_eye_bottom_y = results.faceLandmarks[0][472].y;
@@ -174,7 +273,7 @@ async function predictWebcam() {
         clear_canvas(faceCanvasCtx);
     });
 
-    // draw landmarks on face
+    // find landmarks on face
     for (const landmarks of results.faceLandmarks) {
 
         let landmarksSkipped = 0;
@@ -186,122 +285,59 @@ async function predictWebcam() {
                 // Skip this landmark
                 landmarksSkipped++;
                 return; // Skip to the next iteration of the loop
+            }
+
+            let landmark_x_percent = landmark.x;
+            let landmark_y_percent = landmark.y;
+            let landmark_x =
+                landmark_x_percent * faceCanvasElement.width;
+            let landmark_y =
+                landmark_y_percent * faceCanvasElement.height;
+
+            faceCanvasElements.forEach((faceCanvasElement) => {
+                const faceCanvasCtx = faceCanvasElement.getContext("2d");
+                faceCanvasCtx.font = "6px Ortica";
+                faceCanvasCtx.fillStyle = "white";
+                faceCanvasCtx.fillText(
+                    // landmarkTexts[landmarkTextIndex], landmark_x + getRandomNumber(0,1), landmark_y + getRandomNumber(0,1)
+                    "you", landmark_x + getRandomNumber(0,1), landmark_y + getRandomNumber(0,1)
+
+                );
+            });
+
+            
+        })
     }
 
-                let landmark_x_percent = landmark.x;
-                let landmark_y_percent = landmark.y;
-                let landmark_x =
-                    landmark_x_percent * faceCanvasElement.width;
-                let landmark_y =
-                    landmark_y_percent * faceCanvasElement.height;
-
-
-                faceCanvasElements.forEach((faceCanvasElement) => {
-                    const faceCanvasCtx = faceCanvasElement.getContext("2d");
-                    faceCanvasCtx.font = "6px Ortica";
-                    faceCanvasCtx.fillStyle = "white";
-                    faceCanvasCtx.fillText(
-                        // landmarkTexts[landmarkTextIndex], landmark_x + getRandomNumber(0,1), landmark_y + getRandomNumber(0,1)
-                        "you", landmark_x + getRandomNumber(0,1), landmark_y + getRandomNumber(0,1)
-
-                    );
-                });
-
-            
-            })}
-
-
     if (stage1) {
-        //One-time things
-        if (stage1Launched == false) {
-            changeInstructionText("First, come closer.");
-            button.innerText = "";
-
-            setTimeout(() => { 
-                bg.classList.add("hidden");
-                userFace.classList.replace("hidden", "fadeIn");
-                stage1Launched = true;
-            }, fadeInOutTime);
-            
-        }
-        
         setFace(
             face_bottom_y,
             face_top_y
         );
-
     }
     else if (stage2) {
-        if (stage2Launched == false) {
-            changeInstructionText("I can almost feel your warmth.");
+        matchEyeHeight(
+            face_bottom_y,
+            face_top_y,
+            right_eye_bottom_y,
+            right_eye_top_y,
+            'right', 
+            ".userEye.right"
+        )
 
-            setTimeout(() => {
-                userFace.classList.replace("fadeIn", "hidden");
-                userEyesContainer.classList.replace("hidden", "fadeIn");
-
-                changeInstructionText("Now, offer your sight.");
-                setTimeout(() => { 
-                    button.innerText = "(Blink six times.)";
-                    waited = true;
-                }, fadeInOutTime);
-
-            }, waitForAnimateLetters);
-
-            stage2Launched = true;
-        }
-
-        setTimeout(() => {
-            matchEyeHeight(
-                face_bottom_y,
-                face_top_y,
-                right_eye_bottom_y,
-                right_eye_top_y,
-                'right', 
-                ".userEye.right"
-            )
-
-            matchEyeHeight(
-                face_bottom_y,
-                face_top_y,
-                left_eye_bottom_y,
-                left_eye_top_y,
-                'left',
-                ".userEye.left"
-            );
-        }, waitForAnimateLetters);
-
+        matchEyeHeight(
+            face_bottom_y,
+            face_top_y,
+            left_eye_bottom_y,
+            left_eye_top_y,
+            'left',
+            ".userEye.left"
+        );
 
         // const points = `${results.faceLandmarks[0][33].x* 500},${results.faceLandmarks[0][33].y* 500} ${results.faceLandmarks[0][159].x* 500},${results.faceLandmarks[0][159].y* 500} ${results.faceLandmarks[0][133].x* 500},${results.faceLandmarks[0][133].y* 500} ${results.faceLandmarks[0][145].x* 500},${results.faceLandmarks[0][145].y* 500}`;
         // stage1LeftEye.setAttribute("points", points);
     }
-    else if (stage3) {
-
-        if (stage3Launched == false) {
-            userEyesContainer.classList.replace("fadeIn", "hidden");
-
-            changeInstructionText("Now, offer your voice.");
-            button.innerText = "(Tell me your name.)";
-            detectVoice();
-
-            stage3Launched = true;
-        }
-    }
     else if (stage4) {
-
-        if (stage4Launched == false) {
-            generateEyes();
-            randomEyes(stage4Launched);
-            stage4Launched = true;
-        }
-        changeInstructionText("Your have shown your devotion. Now, you may enter.");
-        
-        setTimeout(() => {
-            instruction.classList.add("hidden");
-            button.classList.add("hidden");
-        }, waitForAnimateLetters);
-
-        main.classList.replace("hidden", "fadeIn");
-
         matchEyeHeight(
             face_bottom_y,
             face_top_y,
@@ -321,7 +357,6 @@ async function predictWebcam() {
         );
             
         } 
-        
 
     }
     if (webcamRunning === true) {
@@ -354,6 +389,16 @@ function clear_canvas(faceCanvasCtx) {
     );
 }
 
+
+function buttonHover() {
+    button.style.cursor = "n-resize";
+    button.style.transform = "scale(1.05)";
+
+    button.addEventListener("mouseout", () => {
+        button.style.transform = "scale(1)";
+    });
+}
+
 function instructionTransition() {
     instruction.classList.add('fadeInOut');
 
@@ -363,7 +408,7 @@ function instructionTransition() {
 }
 
 function animateLetters() {
-    let animationDelay = 0;
+    animationDelay = 0;
     const invitationElements = document.querySelectorAll('.instruction');
 
     wrapLettersWithSpan(invitationElements);
@@ -374,7 +419,7 @@ function animateLetters() {
     });
 
     // !! activate this later
-    // button.style.animationDelay = `${animationDelay+400}ms`;
+    button.style.animationDelay = `${animationDelay+400}ms`;
 }
 
 function wrapLettersWithSpan(textsToSpan) {
@@ -414,34 +459,35 @@ function setFace(
 
     if (faceHeight <= 30) {
         circleHeight = 0;
-    } else if (faceHeight >= 60) {
+    } else if (faceHeight >= 70) {
         circleHeight = 100;
     }
     else {
         circleHeight = Math.abs(
-            map(faceHeight, 30, 60, 0, 100)
+            map(faceHeight, 30, 70, 0, 100)
         );
     }
 
     if (faceHeight > 45 && faceHeight < 55) {
         if (!stage1Closer) {
-            changeInstructionText("Closer.");
+            // changeInstructionText("Closer.");
+            instruction.innerText = "Closer.";
             stage1Closer = true;
         }
     }
-    if (faceHeight >=55 && faceHeight < 60) {
+    if (faceHeight >=55 && faceHeight < 70) {
         if (!stage1EvenCloser) {
-            changeInstructionText("Even closer.")
+            // changeInstructionText("Even closer.")
+            instruction.innerText = "Even closer.";
             stage1EvenCloser = true;
         }
     }
     
     userFace.style.height = `${Math.floor(circleHeight)}%`;
-    userFace.style.width = `${Math.floor(circleHeight) * .55}%`;
+    userFace.style.width = `${Math.floor(circleHeight) * .60}%`;
 
     if (circleHeight >= 100) {
-        stage1 = false;
-        stage2 = true;
+        stage2Start();
     }
 
 }
@@ -465,11 +511,9 @@ function detectVoice() {
 
                 if (event.results[i].isFinal) {
                     finalTranscript += transcript;
-                    wordCount = interimTranscript.split(" ").length;
 
                 } else {
                     interimTranscript += transcript;
-                    wordCount = interimTranscript.split(" ").length;
                 }
             }
 
@@ -477,13 +521,15 @@ function detectVoice() {
                 finalTranscript + interimTranscript;
 
             const normalizedSpeech = speech.toLowerCase().trim();
+            const words = normalizedSpeech.trim().split(/\s+/);
             const normalizedTarget = "my name is";
             // console.log("speech:" + normalizedSpeech);
 
-            if (normalizedSpeech.startsWith(normalizedTarget)) {
-                console.log("my name is")
-                stage3 = false;
-                stage4 = true;
+            // if (normalizedSpeech.startsWith(normalizedTarget)) {
+                // if (normalizedSpeech.trim() !== "") {
+            if (words.length >= 2) {
+                console.log("anything")
+                stage4Start();
                 recognition.stop();
             }
         };
@@ -526,6 +572,16 @@ function generateEyes() {
         eyesContainer.appendChild(rightEyeDiv);
         eyesContainer.appendChild(ghostImage);
         main.appendChild(eyesContainer);
+
+        eyesContainer.addEventListener("click", () => {
+            const newScaleValue = 0;
+            ghostImagefeDisplacementMap.setAttribute('scale', newScaleValue.toString());
+        });
+
+        eyesContainer.addEventListener("mouseout", () => {
+            const OGScaleValue = 100;
+            ghostImagefeDisplacementMap.setAttribute('scale', OGScaleValue.toString());
+        });
     }
 
 }
@@ -555,12 +611,12 @@ function matchEyeHeight(
         //Switch eyes when blinked enough times
         if (left_closed && right_closed && been_open) {
             been_open = false;
-            eyesClosed++;
             console.log(eyesClosed);
-            if (stage2 && waited == true) {
+            if (stage2) {
                 // landmarkTextIndex++;
                 landmarkSkipThreshold -= .1;
                 faceCanvasOpacity += (1-0.1)/5;
+                chimeAudios[eyesClosed % chimeAudios.length].play();
 
                 const boxShadowValues = [
                     '0 0 0 5px yellow',
@@ -589,17 +645,17 @@ function matchEyeHeight(
                 });
 
                 // !! Change this to 6 later!!
-                if (eyesClosed >= 6) {
+                if (eyesClosed >= 5) {
                     eyesClosed = 0;
-                    stage2 = false;
-                    stage3 = true;
+                    stage3Start();
                     console.log("blinked 6 times")
                 }
             }
+                eyesClosed++;
             if (stage4 && eyesClosed > getRandomNumber(1,4))
             {
                 // console.log(getRandomNumber(1,4) + "new set of bg eyes")
-                randomEyes(stage4Launched);
+                randomEyes();
                 eyesClosed = 0;
             }
         }
@@ -641,15 +697,9 @@ function matchEyeHeight(
 }
 
 //randomly choose two pairs of eyes to match user eyes
-function randomEyes(stage4Launched) {
-    const eyeContainers = document.querySelectorAll(".eyes");
+function randomEyes() {
     eyeContainers.forEach((eyeContainer) => {
-        if (stage4Launched == false) {
-            eyeContainer.classList.add("hidden");
-        }
-        else {
             eyeContainer.classList.replace("visible", "hidden");
-        }
     });
     let randomIndex1 = getRandomIndex(eyeContainers.length);
     let randomIndex2;
@@ -659,6 +709,8 @@ function randomEyes(stage4Launched) {
 
     eyeContainers[randomIndex1].classList.replace("hidden", "visible");
     eyeContainers[randomIndex2].classList.replace("hidden", "visible");
+
+    console.log(eyeContainers[randomIndex1].style.bg, eyeContainers[randomIndex2].style.bg);
 }
 
 
@@ -675,4 +727,5 @@ function setEyeHeight(selector, eyeHeight) {
 
 (function init() {
     window.addEventListener("DOMContentLoaded", animateLetters);
+    button.addEventListener("mouseover", buttonHover);
 })();
