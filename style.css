@@ -1,3 +1,42 @@
+:root {
+    --blur: 10px;
+}
+
+@font-face {
+    font-family: 'Apoc';
+    src: url(assets/fonts/AT_Apoc_Revelations.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Bembo';
+    src: url(assets/fonts/BemboStd.otf);
+}
+
+@font-face {
+    font-family: 'arialby10';
+    src: url(assets/fonts/Arial1by10-Light.otf);
+}
+
+@font-face {
+    font-family: 'arialnarrowpool';
+    src: url(assets/fonts/ArialNarrowPool-Regular.otf);
+}
+
+@font-face {
+    font-family: 'GTSectra';
+    src: url(assets/fonts/GT-Sectra-Fine-Regular.woff);
+}
+
+@font-face {
+    font-family: 'Sinistre';
+    src: url(assets/fonts/Sinistre-StCaroline.woff);
+}
+
+@font-face {
+    font-family: 'Ortica';
+    src: url(assets/fonts/OrticaAngular-Bold.woff2);
+}
+
 html, * {
     box-sizing: border-box;
     
@@ -15,12 +54,47 @@ html, * {
 body {
     background:black;
     overflow:hidden;
-    font-size:20px;
+    font-family: 'Ortica', serif;
+    font-size:28px;
     line-height:1em;
 }
 
-video {
-    display:none;
+.bg {
+   width:100vw;
+   height:100vh; 
+   position:fixed;
+   z-index: -1;
+   top:0;
+   left:0;
+   display:flex;
+   flex-flow: row wrap;
+   justify-content:space-between;
+}
+
+.bgLeft, .bgRight, .bgCenter {
+    height:100%;
+}
+
+.bgLeft, .bgRight {
+    width:20%;
+    opacity: .2;
+    filter:blur(calc(var(--blur)/4));
+}
+
+.bgLeft {
+    background: url(assets/imgs/landing/gifs/rotoscoped_cicada_molting.gif) no-repeat left top / contain;
+}
+
+.bgRight {
+    transform: scaleX(-1);
+    background: url(assets/imgs/landing/gifs/rotoscoped_cicada_molting.gif) no-repeat left top / contain;
+}
+
+.bgCenter {
+    width:60%;
+    background: url(assets/imgs/landing/portal.png) no-repeat center bottom / 100% 90%;
+
+    filter:blur(calc(var(--blur)/5));
 }
 
 .invitation {
@@ -37,32 +111,30 @@ video {
     justify-content: space-between;
     align-items: center;
 
-    width:1000px;
-
-    /* filter: url(#displacement-filter); */
+    width:80%;
+    min-width:800px;
 }
 
 .instruction {
-	/* animation: textRotation 8s linear infinite;
-	transform-origin: 100px -200px;
-    width:100px;
-    height:100px;
-    background:blue; */
     display:flex;
     flex-flow: row wrap;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     /* background:blue; */
     width:100%;
     color:white;
 }
 
-
-.animated-text {
+.animated-word {
     display:flex;
     flex-flow: row wrap;
     justify-content: center;
     align-content: center;
+    margin: .5em .2em;
+}
+
+.animated-letter {
+    margin: 0 .2em;
     text-align:center;
     animation: pulse 10s linear infinite;
     text-shadow: 
@@ -70,35 +142,57 @@ video {
         0 0 20px 10px black, /* Second shadow */
         0 0 30px 10px black;
     opacity:0;
-    filter: blur(10px);
+    filter: blur(var(--blur));
 }
 
 
 @keyframes pulse {
     0% {
         opacity:0;
-        transform: scale(1);
-        filter: blur(10px) hue-rotate(0deg);
+        transform: scale(.5);
+        filter: blur(var(--blur)) hue-rotate(0deg);
     }
-    50% {
+    10% {
+        opacity:.5;
+        transform: scale(.75);
+        filter: blur(0) hue-rotate(180deg);
+    }
+    30% {
         opacity:1;
-        transform: scale(2);
-        filter: blur(0px) hue-rotate(180deg);
+        transform: scale(1.5);
+        filter: blur(0) hue-rotate(180deg);
     }
     100% {
         opacity:0;
-        transform: scale(1);
-        filter: blur(10px) hue-rotate(0deg);
+        transform: scale(.5);
+        filter: blur(var(--blur)) hue-rotate(0deg);
     }
 }
 
-
 .button {
+    animation: glow 5s ease-in-out infinite;
+    animation-delay: 2s;
     margin-top:3em;
+    filter:blur(calc(var(--blur)/5));
+    transition: filter 1s ease-in-out, opacity 1s ease-in-out;
 }
 
 .button:hover {
     cursor:pointer;
+    opacity:1;
+    filter:blur(0px);
+}
+
+@keyframes glow {
+    0% {
+        opacity:0;
+    }
+    50% {
+        opacity:.5;
+    }
+    100% {
+        opacity:0;
+    }
 }
 
 /* svg {
@@ -112,6 +206,11 @@ video {
       fill: grey;
       stroke: white;
 } */
+
+
+.userFace, .userEyes, .button {
+    opacity: 0;
+}
 
 /* STAGE 1 */
 .userFace {
@@ -129,10 +228,60 @@ video {
     background:transparent;
     /* background: url("assets/death_mask.png") no-repeat center / cover;
     background-size: 200% 200%; */
-    filter: blur(10px);
-
-    transition: 1s;
+    filter: blur(var(--blur));
     
+}
+
+/* STAGE 2 */
+.userEyes {
+    position:absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display:flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items:center;
+    width:calc(100vmax - 1em);
+    height: calc(100vmax / 3);
+    /* filter: blur(calc(var(--blur) * 2)); */
+}
+
+.userEye {
+    width:45%;
+    height:100%;
+    /* filter: blur(var(--blur)); */
+
+    border-radius: 50%;
+    border: 1px solid white;
+    box-shadow:  
+        0 0 0 5px yellow,
+        0 0 0 10px blue,
+        0 0 0 15px red;
+
+    overflow:hidden;
+
+    display:flex;
+    justify-content: center;
+    align-items: center;
+
+    background:transparent;
+}
+
+video {
+    width:100vw;
+    height:100vh;
+    display:none;
+    /* filter:hue-rotate(90deg); */
+
+    /* filter: url(#displacementFilter); */
+}
+
+.face_canvas {
+    width:100vw;
+    height:100vh;
+    position:relative;
+    opacity: .1;
 }
 
 /* STAGE 3 */
@@ -145,31 +294,17 @@ video {
     transform: translate(-50%, -50%);
 }
 
-.userEyes {
-    position:absolute;
-    top: 10%;
-    display:flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    width:calc(100vmax - 1em);
-    height: calc(100vmax / 5);
-}
 
-.userEye {
-    background:white;
-    width:45%;
-    height:100%;
-    border-radius: 50%;
-    z-index:20;
-    filter: blur(20px);
-}
 
 /* STAGE 4 */
 .main {
     z-index:100;
     width:100%;
     height:100%;
+    /* background:pink;
+    overflow:visible; */
 }
+
 .BGeyes {
     position:absolute;
     display:flex;
@@ -181,6 +316,15 @@ video {
     
 }
 
+.BGeyes.visible:hover {
+    cursor: pointer;
+}
+
+.BGeyes.visible:hover .ghostImage {
+    opacity: 1;
+}
+
+
 .BGeye {
     position:relative;
     width:20%;
@@ -188,20 +332,49 @@ video {
     border-radius: 50%;
     background:red;
     display:block;
-    filter: blur(4px);
+    filter: blur(calc(var(--blur)/2));
+}
+
+.ghostImage {
+    position:fixed;
+    z-index:100;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s;
+
+    filter: url(#displacementFilter);
+}
+
+
+/* GENERAL */
+.visible {
+    opacity:1;
 }
 
 .hidden {
-    /* visibility:hidden;
-    display:none; */
+    transition: opacity 1s;
     opacity: 0;
 }
 
 .fadeIn {
+    transition: opacity 1s;
     opacity: 1;
 }
 
-.blur {
+.fadeInOut {
+    animation: fadeInOut 4s ease-in-out forwards;
+}
 
-    filter: blur(1px);
+@keyframes fadeInOut {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.blur {
+    filter: blur(calc(var(--blur)/5));
 }

@@ -12,33 +12,71 @@ let webcamRunning = false;
 
 const video = document.getElementById("webcam");
 
-// Declare eye variables
+// Declare other variables
 const body = document.querySelector("body");
 const invitation = document.querySelector(".invitation");
 const instruction = document.querySelector(".instruction");
 const button = document.querySelector(".button");
+const bg = document.querySelector(".bg");
+let fadeInOutTime = 2000;
+let waitForAnimateLetters = fadeInOutTime * 4;
 
+let broodAudio = new Audio('assets/audio/cicadas/broodX.wav');
+broodAudio.loop = true;
+let cicadaAudio = new Audio('assets/audio/cicadas/cicada_close.wav');
+cicadaAudio.loop = true;
 
+const ghostImageUrls = [
+    "assets/imgs/main/ectoplasm1.gif",
+    "assets/imgs/main/anti-vampire_burial.png",
+    "assets/imgs/main/ectoplasm2.jpeg",
+    "assets/imgs/main/ectoplasm3.jpeg",
+    "assets/imgs/main/Lo_Shu_Square.jpeg", 
+    "assets/imgs/main/magic_circle.jpeg", 
+    "assets/imgs/main/Munich_Manual1.png",
+    "assets/imgs/main/Munich_Manual2.png",
+    "assets/imgs/main/Peppers_Ghost.jpeg",
+    "assets/imgs/main/Solomonic_circle.gif", 
+    "assets/imgs/main/spirit_photo1.jpeg",
+    "assets/imgs/main/spirit_photo2.jpeg",
+    "assets/imgs/main/spirit_photo3.jpeg",
+    "assets/imgs/main/spirit_photo4.jpeg"
+]
+
+//STAGE 1 // COME CLOSER
 let stage1 = false;
 let stage1Launched = false;
-//STAGE 1 // COME CLOSER
+let stage1Closer = false;
+let stage1EvenCloser = false;
 const userFace = document.querySelector(".userFace");
 
 
+//STAGE 2 // BLINK
 let stage2 = false;
 let stage2Launched = false;
-//STAGE 2 // BLINK
-const userEyes = document.querySelector(".userEyes");
+let waited = false;
+const userEyesContainer = document.querySelector(".userEyes");
+const userEyes = document.querySelectorAll(".userEye");
+
+const faceCanvasElement = document.getElementsByClassName("face_canvas")[0];
+const faceCanvasElements = document.querySelectorAll(".face_canvas");
+
+const landmarkTexts = ["I", "peer", "through", "your", "eyes"];
+let landmarkTextIndex = 0;
+let landmarkSkipThreshold = 0.9;
+let faceCanvasOpacity = .1;
+
+// let userEyesBlur = 20;
 // const stage1LeftEye = document.querySelector("svg polygon");
 
+//STAGE 3 // SPEAK
 let stage3 = false;
 let stage3Launched = false;
-//STAGE 3 // SPEAK
 let wordCount;
 
+//STAGE 4
 let stage4 = false;
 let stage4Launched = false;
-//STAGE 4
 const main = document.querySelector(".main");
 let eyeHeight;
 let eyeHeight_max = 100;
@@ -71,9 +109,15 @@ function hasGetUserMedia() {
 }
 
 if (hasGetUserMedia()) {
-//   button.addEventListener("click", enableCam);
     button.addEventListener("click", function() {
-        stage1 = true;
+        // stage1 = true;
+        stage2 = true;
+        // stage3 = true;
+        // stage4 = true;
+        enableCam();
+        broodAudio.play();
+        cicadaAudio.play();
+
     });
 } else {
   console.warn("getUserMedia() is not supported by your browser");
@@ -97,13 +141,10 @@ function enableCam() {
   
 }
 
-setTimeout(enableCam,100);
-
 
 let lastVideoTime = -1;
 let results = undefined;
 async function predictWebcam() {
-    console.log("called")
 
   let startTimeMs = performance.now();
   if (lastVideoTime !== video.currentTime) {
@@ -126,13 +167,62 @@ async function predictWebcam() {
     let left_eye_bottom_y = results.faceLandmarks[0][477].y;
     let left_eye_top_y = results.faceLandmarks[0][475].y;
 
+    // FACE LANDMARKS
+    faceCanvasElements.forEach((faceCanvasElement) => {
+        const faceCanvasCtx = faceCanvasElement.getContext("2d");
+        faceCanvasCtx.save();
+        clear_canvas(faceCanvasCtx);
+    });
+
+    // draw landmarks on face
+    for (const landmarks of results.faceLandmarks) {
+
+        let landmarksSkipped = 0;
+        landmarks.forEach((landmark, i) => {
+            const randomValue = Math.random();
+
+            // Skipping fewer and fewer landmarks each blink
+            if (randomValue < landmarkSkipThreshold && landmarksSkipped < landmarks.length) {
+                // Skip this landmark
+                landmarksSkipped++;
+                return; // Skip to the next iteration of the loop
+    }
+
+                let landmark_x_percent = landmark.x;
+                let landmark_y_percent = landmark.y;
+                let landmark_x =
+                    landmark_x_percent * faceCanvasElement.width;
+                let landmark_y =
+                    landmark_y_percent * faceCanvasElement.height;
+
+
+                faceCanvasElements.forEach((faceCanvasElement) => {
+                    const faceCanvasCtx = faceCanvasElement.getContext("2d");
+                    faceCanvasCtx.font = "6px Ortica";
+                    faceCanvasCtx.fillStyle = "white";
+                    faceCanvasCtx.fillText(
+                        // landmarkTexts[landmarkTextIndex], landmark_x + getRandomNumber(0,1), landmark_y + getRandomNumber(0,1)
+                        "you", landmark_x + getRandomNumber(0,1), landmark_y + getRandomNumber(0,1)
+
+                    );
+                });
+
+            
+            })}
+
 
     if (stage1) {
+        //One-time things
         if (stage1Launched == false) {
-            instruction.innerText = "First, come closer.";
+            changeInstructionText("First, come closer.");
             button.innerText = "";
-            userFace.classList.replace("hidden", "fadeIn");
-            stage1Launched = true;
+
+            setTimeout(() => { 
+                bg.classList.add("hidden");
+                userFace.classList.replace("hidden", "fadeIn");
+                stage1Launched = true;
+            }, fadeInOutTime);
+            
         }
         
         setFace(
@@ -143,47 +233,74 @@ async function predictWebcam() {
     }
     else if (stage2) {
         if (stage2Launched == false) {
-            userFace.classList.replace("fadeIn", "hidden");
-            userEyes.classList.replace("hidden", "fadeIn");
+            changeInstructionText("I can almost feel your warmth.");
 
-            instruction.innerText = "Now, offer your sight.";
-            button.innerText = "(Blink six times.)";
+            setTimeout(() => {
+                userFace.classList.replace("fadeIn", "hidden");
+                userEyesContainer.classList.replace("hidden", "fadeIn");
+
+                changeInstructionText("Now, offer your sight.");
+                setTimeout(() => { 
+                    button.innerText = "(Blink six times.)";
+                    waited = true;
+                }, fadeInOutTime);
+
+            }, waitForAnimateLetters);
+
             stage2Launched = true;
         }
 
-        matchEyeHeight(
-            face_bottom_y,
-            face_top_y,
-            right_eye_bottom_y,
-            right_eye_top_y,
-            'right', 
-            ".userEye.right"
-        )
+        setTimeout(() => {
+            matchEyeHeight(
+                face_bottom_y,
+                face_top_y,
+                right_eye_bottom_y,
+                right_eye_top_y,
+                'right', 
+                ".userEye.right"
+            )
 
-        matchEyeHeight(
-            face_bottom_y,
-            face_top_y,
-            left_eye_bottom_y,
-            left_eye_top_y,
-            'left',
-            ".userEye.left"
-        );
+            matchEyeHeight(
+                face_bottom_y,
+                face_top_y,
+                left_eye_bottom_y,
+                left_eye_top_y,
+                'left',
+                ".userEye.left"
+            );
+        }, waitForAnimateLetters);
 
 
         // const points = `${results.faceLandmarks[0][33].x* 500},${results.faceLandmarks[0][33].y* 500} ${results.faceLandmarks[0][159].x* 500},${results.faceLandmarks[0][159].y* 500} ${results.faceLandmarks[0][133].x* 500},${results.faceLandmarks[0][133].y* 500} ${results.faceLandmarks[0][145].x* 500},${results.faceLandmarks[0][145].y* 500}`;
         // stage1LeftEye.setAttribute("points", points);
     }
     else if (stage3) {
-        userEyes.classList.add("hidden");
-        instruction.innerText = "Now, offer your voice.";
-        button.innerText = "(Tell me your name.)";
-        detectVoice();
-        stage3 = false;
+
+        if (stage3Launched == false) {
+            userEyesContainer.classList.replace("fadeIn", "hidden");
+
+            changeInstructionText("Now, offer your voice.");
+            button.innerText = "(Tell me your name.)";
+            detectVoice();
+
+            stage3Launched = true;
+        }
     }
     else if (stage4) {
-        instruction.innerText = "Your have shown your devotion. Now, you may enter.";
-        userEyes.classList.add("hidden");
-        main.classList.remove("hidden");
+
+        if (stage4Launched == false) {
+            generateEyes();
+            randomEyes(stage4Launched);
+            stage4Launched = true;
+        }
+        changeInstructionText("Your have shown your devotion. Now, you may enter.");
+        
+        setTimeout(() => {
+            instruction.classList.add("hidden");
+            button.classList.add("hidden");
+        }, waitForAnimateLetters);
+
+        main.classList.replace("hidden", "fadeIn");
 
         matchEyeHeight(
             face_bottom_y,
@@ -228,6 +345,63 @@ function getRandomIndex(max) {
 }
 
 
+function clear_canvas(faceCanvasCtx) {
+    faceCanvasCtx.clearRect(
+        0,
+        0,
+        faceCanvasElement.width,
+        faceCanvasElement.height
+    );
+}
+
+function instructionTransition() {
+    instruction.classList.add('fadeInOut');
+
+    setTimeout(() => { 
+        instruction.classList.remove('fadeInOut');
+    }, fadeInOutTime);
+}
+
+function animateLetters() {
+    let animationDelay = 0;
+    const invitationElements = document.querySelectorAll('.instruction');
+
+    wrapLettersWithSpan(invitationElements);
+    
+    document.querySelectorAll('.animated-letter').forEach((letter, i) => {
+        letter.style.animationDelay = `${animationDelay}ms`; 
+        animationDelay+=400;
+    });
+
+    // !! activate this later
+    // button.style.animationDelay = `${animationDelay+400}ms`;
+}
+
+function wrapLettersWithSpan(textsToSpan) {
+    textsToSpan.forEach(textToSpan => {
+        // Get the text content of the element
+        const text = textToSpan.textContent.trim();
+    
+        const words = text.split(" ");
+        const spannedWords = words.map(word => {
+            // Split each word into letters
+            const letters = word.split("");
+            // Wrap each letter in a span
+            const spannedLetters = letters.map(letter => `<span class="animated-letter">${letter}</span>`).join("");
+            // Wrap the word in a span
+            return `<span class="animated-word">${spannedLetters}</span>`;
+        }).join(" ");
+
+        textToSpan.innerHTML = spannedWords;
+    });
+}
+
+function changeInstructionText(text) {
+    instruction.innerText = text;
+    animateLetters();
+}
+
+
 //STAGE 1 FUNCTIONS
 function setFace(
     face_bottom_y,
@@ -235,24 +409,37 @@ function setFace(
 ) {
     let faceHeight = (face_bottom_y -
         face_top_y) * 100;
-        console.log(faceHeight)
+    let circleHeight;
+    // console.log(faceHeight);
 
-    if (faceHeight <= 10) {
-        faceHeight = 0;
+    if (faceHeight <= 30) {
+        circleHeight = 0;
     } else if (faceHeight >= 60) {
-        faceHeight = 100;
+        circleHeight = 100;
     }
     else {
-        faceHeight = Math.abs(
-            map(faceHeight, 10, 60, 0, 100)
+        circleHeight = Math.abs(
+            map(faceHeight, 30, 60, 0, 100)
         );
     }
-    
-    faceHeight = Math.floor(faceHeight);
-    userFace.style.height = `${faceHeight}%`;
-    userFace.style.width = `${faceHeight * .75}%`;
 
-    if (face_bottom_y > 1) {
+    if (faceHeight > 45 && faceHeight < 55) {
+        if (!stage1Closer) {
+            changeInstructionText("Closer.");
+            stage1Closer = true;
+        }
+    }
+    if (faceHeight >=55 && faceHeight < 60) {
+        if (!stage1EvenCloser) {
+            changeInstructionText("Even closer.")
+            stage1EvenCloser = true;
+        }
+    }
+    
+    userFace.style.height = `${Math.floor(circleHeight)}%`;
+    userFace.style.width = `${Math.floor(circleHeight) * .55}%`;
+
+    if (circleHeight >= 100) {
         stage1 = false;
         stage2 = true;
     }
@@ -295,6 +482,7 @@ function detectVoice() {
 
             if (normalizedSpeech.startsWith(normalizedTarget)) {
                 console.log("my name is")
+                stage3 = false;
                 stage4 = true;
                 recognition.stop();
             }
@@ -312,7 +500,7 @@ function detectVoice() {
 
 //EYE FUNCTIONS
 function generateEyes() {
-    const numDivs = 30;
+    const numDivs = ghostImageUrls.length;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
@@ -324,6 +512,10 @@ function generateEyes() {
         const rightEyeDiv = document.createElement("div");
         rightEyeDiv.classList.add("BGeye", "right");
 
+        const ghostImage = document.createElement("div");
+        ghostImage.classList.add("ghostImage");
+        ghostImage.style.background = `url(${ghostImageUrls[i]}) no-repeat center / cover`;
+
         const eyesContainer = document.createElement("div");
         eyesContainer.classList.add("BGeyes", "eyes");
 
@@ -332,6 +524,7 @@ function generateEyes() {
 
         eyesContainer.appendChild(leftEyeDiv);
         eyesContainer.appendChild(rightEyeDiv);
+        eyesContainer.appendChild(ghostImage);
         main.appendChild(eyesContainer);
     }
 
@@ -345,6 +538,7 @@ function matchEyeHeight(
     whichSide,
     selector
 ) {
+
     let eye_face_ratio =
         ((eye_bottom_y - eye_top_y) / (face_bottom_y - face_top_y)) * 10000;
         // console.log("eye_face_ratio", eye_face_ratio)
@@ -363,16 +557,49 @@ function matchEyeHeight(
             been_open = false;
             eyesClosed++;
             console.log(eyesClosed);
-            //!! Change this number to 6 later !!
-            if (stage2 && eyesClosed >= 1) {
-                eyesClosed = 0;
-                stage2 = false;
-                stage3 = true;
-                console.log("blinked 6 times")
+            if (stage2 && waited == true) {
+                // landmarkTextIndex++;
+                landmarkSkipThreshold -= .1;
+                faceCanvasOpacity += (1-0.1)/5;
+
+                const boxShadowValues = [
+                    '0 0 0 5px yellow',
+                    '0 0 0 10px blue',
+                    '0 0 0 15px red',
+                    '0 0 0 25px yellow',
+                    '0 0 0 35px blue',
+                    '0 0 0 45px red',
+                    '0 0 0 55px yellow',
+                    '0 0 0 65px blue',
+                    '0 0 0 75px red',
+                    '0 0 0 85px blue',
+                    '0 0 0 95px red',
+                    '0 0 0 105px yellow',
+                    '0 0 0 115px blue',
+                    '0 0 0 125px red',
+                    '0 0 0 135px yellow',
+                    '0 0 0 145px blue',
+                    '0 0 0 155px red'
+                ];
+                const boxShadow = boxShadowValues.join(', ');
+
+                userEyes.forEach((userEye) => userEye.style.boxShadow = boxShadow);
+                faceCanvasElements.forEach((faceCanvasElement) => {
+                    faceCanvasElement.style.opacity = faceCanvasOpacity;
+                });
+
+                // !! Change this to 6 later!!
+                if (eyesClosed >= 6) {
+                    eyesClosed = 0;
+                    stage2 = false;
+                    stage3 = true;
+                    console.log("blinked 6 times")
+                }
             }
             if (stage4 && eyesClosed > getRandomNumber(1,4))
             {
-                randomEyes();
+                // console.log(getRandomNumber(1,4) + "new set of bg eyes")
+                randomEyes(stage4Launched);
                 eyesClosed = 0;
             }
         }
@@ -386,6 +613,14 @@ function matchEyeHeight(
         }
         if (!left_closed && !right_closed) {
             been_open = true;
+            const boxShadowValues = [
+                '0 0 0 5px yellow',
+                '0 0 0 10px blue',
+                '0 0 0 15px red'
+            ];
+            const boxShadow = boxShadowValues.join(', ');
+            
+            userEyes.forEach((userEye) => userEye.style.boxShadow = boxShadow);
         }
 
         if (eye_face_ratio >= eyesOpenRatio) {
@@ -406,10 +641,15 @@ function matchEyeHeight(
 }
 
 //randomly choose two pairs of eyes to match user eyes
-function randomEyes() {
+function randomEyes(stage4Launched) {
     const eyeContainers = document.querySelectorAll(".eyes");
     eyeContainers.forEach((eyeContainer) => {
-        eyeContainer.classList.add("hidden");
+        if (stage4Launched == false) {
+            eyeContainer.classList.add("hidden");
+        }
+        else {
+            eyeContainer.classList.replace("visible", "hidden");
+        }
     });
     let randomIndex1 = getRandomIndex(eyeContainers.length);
     let randomIndex2;
@@ -434,6 +674,5 @@ function setEyeHeight(selector, eyeHeight) {
 }
 
 (function init() {
-    generateEyes();
-    randomEyes();
+    window.addEventListener("DOMContentLoaded", animateLetters);
 })();
