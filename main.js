@@ -460,23 +460,23 @@ function setFace(
 
     if (faceHeight <= 30) {
         circleHeight = 0;
-    } else if (faceHeight >= 70) {
+    } else if (faceHeight >= 90) {
         circleHeight = 100;
     }
     else {
         circleHeight = Math.abs(
-            map(faceHeight, 30, 70, 0, 100)
+            map(faceHeight, 30, 90, 0, 100)
         );
     }
 
-    if (faceHeight > 45 && faceHeight < 55) {
+    if (faceHeight > 45 && faceHeight < 65) {
         if (!stage1Closer) {
             // changeInstructionText("Closer.");
             instruction.innerText = "Closer.";
             stage1Closer = true;
         }
     }
-    if (faceHeight >=55 && faceHeight < 70) {
+    if (faceHeight >=65 && faceHeight < 90) {
         if (!stage1EvenCloser) {
             // changeInstructionText("Even closer.")
             instruction.innerText = "Even closer.";
@@ -663,7 +663,7 @@ function matchEyeHeight(
                 }
             }
                 eyesClosed++;
-            if (stage4 && eyesClosed > getRandomNumber(1,4))
+            if (stage4 && eyesClosed > getRandomNumber(1,3))
             {
                 // console.log(getRandomNumber(1,4) + "new set of bg eyes")
                 randomEyes();
