@@ -170,6 +170,7 @@ body {
 }
 
 .button {
+    font-size:.75em;
     animation: glow 5s ease-in-out infinite;
     animation-delay: 2s;
     margin-top:3em;
@@ -177,6 +178,7 @@ body {
     transition: filter 1s ease-in-out, opacity 1s ease-in-out;
     border: inset 2px white;
     padding: 1rem;
+    text-align:center;
 }
 
 .button:hover {

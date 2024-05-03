@@ -57,6 +57,7 @@ const ghostImageUrls = [
     "assets/imgs/main/spirit_photo1.jpeg", 
     "assets/imgs/main/spirit_photo2.jpeg", 
     "assets/imgs/main/spirit_photo3.jpeg", 
+    "assets/imgs/main/GNT1-JX01-_2024-04-12T10_22_26.gif",
 ]
 
 //STAGE 1 // COME CLOSER
@@ -207,7 +208,7 @@ function stage3Start() {
     button.innerText = "";
     changeInstructionText("Then, your voice.");
     setTimeout(() => { 
-        button.innerText = "(Tell me your name, with strength and clarity.)";
+        button.innerHTML = "(Tell me your name.<br>Start with, 'My name is...')";
     }, animationDelay + 400);
     detectVoice();
 }
@@ -525,12 +526,22 @@ function detectVoice() {
             const normalizedTarget = "my name is";
             // console.log("speech:" + normalizedSpeech);
 
-            // if (normalizedSpeech.startsWith(normalizedTarget)) {
-                // if (normalizedSpeech.trim() !== "") {
-            if (words.length >= 2) {
+            // const targetCount = words.reduce((count, word) => {
+            //     if (word === normalizedTarget) {
+            //         return count + 1;
+            //     }
+            //     return count;
+            // }, 0);
+
+            // if (targetCount >= 3) {
+            if (normalizedSpeech.startsWith(normalizedTarget)) {
+            // if (normalizedSpeech.trim() !== "") {
+            // if (words.length >= 2) {
                 console.log("anything")
-                stage4Start();
-                recognition.stop();
+                setTimeout(() => {
+                    stage4Start();
+                    recognition.stop();
+                }, 800);
             }
         };
 
